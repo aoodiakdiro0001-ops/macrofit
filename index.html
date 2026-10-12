@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacroFit | Macro & Meal Prep Calculator</title>
+<meta name="description" content="Calories and macros by goal, automatic food substitutions, sample meal plans and supplement links.">
+<link rel="canonical" href="https://aoodiakdiro0001-ops.github.io/macrofit/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0c0f14">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MacroFit | Macro Calculator">
+<meta property="og:description" content="TDEE, protein/carb/fat targets, smart food swaps.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Consolas,monospace}
+:root{--bg:#0c0f14;--panel:#151c30;--line:#2a3557;--grn:#34d399;--gold:#fbbf24;--blu:#60a5fa;--txt:#e0e6f2;--mut:#8b98b8;--org:#fb923c}
+body{background:var(--bg);color:var(--txt)}
+header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{font-size:22px;font-weight:900;color:var(--grn)}
+.logo small{display:block;font-size:11px;color:var(--mut);font-weight:400}
+header select{margin-left:auto;background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:7px 10px;font-size:13px}
+.tabs{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.tabs button{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-bottom:none;padding:10px 16px;border-radius:12px 12px 0 0;cursor:pointer;font-weight:800;font-size:13px}
+.tabs button.on{background:#1a2547;color:var(--grn)}
+main{max-width:1100px;margin:0 auto;padding:18px 15px 60px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:22px;display:none}
+.panel.on{display:block}
+.panel h2{color:var(--grn);margin-bottom:6px;font-size:19px}
+.panel p.sub{color:var(--mut);font-size:13px;margin-bottom:12px;line-height:1.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.box{background:#0c0f14;border:1px solid var(--line);border-radius:14px;padding:16px}
+.box h3{font-size:14px;color:var(--blu);margin-bottom:10px}
+label.fl{display:block;font-size:12.5px;color:var(--mut);margin:8px 0 3px}
+input[type=text],input[type=number],select{background:#0c0f14;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 13px;font-size:14px;outline:none;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center}
+button.go{background:var(--grn);color:#04160a;border:none;padding:11px 26px;border-radius:10px;font-weight:900;cursor:pointer;font-size:14px}
+button.alt{background:transparent;color:var(--blu);border:1px solid var(--blu);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:13px}
+.macrobar{display:flex;height:26px;border-radius:13px;overflow:hidden;margin:10px 0}
+.macrobar div{height:100%}
+.res{background:#0c0f14;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;font-size:14px;line-height:2}
+.res b.big{font-size:22px;color:var(--gold)}
+table.bt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.bt th,table.bt td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:left}
+table.bt th{color:var(--grn);font-size:12px}
+table.bt td.n{text-align:right;font-variant-numeric:tabular-nums}
+.note{background:#1a2547;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--mut);margin:10px 0;line-height:1.7}
+.warn{background:#3a2c10;border:1px solid var(--gold);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--gold);margin:10px 0}
+.suppgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:10px}
+.supp{background:#0c0f14;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;font-size:13px}
+.supp b{display:block;font-size:15px;margin-bottom:4px}
+.supp small{color:var(--mut);display:block;margin-bottom:10px}
+.supp a{background:var(--grn);color:#06281c;font-weight:800;text-decoration:none;font-size:12.5px;padding:8px 16px;border-radius:12px;display:inline-block;margin:2px}
+.refbadge{font-size:10px;font-weight:900;background:var(--gold);color:#231a03;border-radius:8px;padding:2px 7px;margin-left:6px}
+.donate{background:linear-gradient(135deg,#1a2547,#0e2a1d);border:1px solid var(--grn);border-radius:16px;padding:20px;text-align:center;margin-top:8px;font-size:13px}
+.donate .addr{background:#0c0f14;border-radius:10px;padding:10px;font-family:monospace;font-size:12px;word-break:break-all;direction:ltr;margin:6px auto;color:var(--grn);max-width:560px}
+.adslot{max-width:1100px;margin:12px auto 0;padding:0 15px;text-align:center}
+.adslot .ph{display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px}
+footer{text-align:center;color:var(--mut);font-size:12.5px;padding:26px 16px;border-top:1px solid var(--line);line-height:2}
+footer a{color:var(--grn)}
+#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 25px;border-radius:25px;z-index:200;display:none;font-size:14px;max-width:92vw;text-align:center}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">🥗 MacroFit<small data-i="tag"></small></div>
+<select id="langSel" onchange="setLang(this.value)">
+<option value="en" selected>🇬🇧 English</option><option value="tr">🇹🇷 Türkçe</option><option value="ar">🇸🇦 العربية</option>
+</select>
+</header>
+<div class="note" style="max-width:1100px;margin:12px auto 0"><span data-i="medNote" style="display:block;background:#3d1414;border:1px solid var(--red,#f87171);color:#ffb4b4;border-radius:10px;padding:10px 14px;font-size:12.5px"></span></div>
+<div class="tabs" id="tabs"></div>
+<main>
+<section class="panel on" id="p-calc">
+<h2 data-i="cT"></h2><p class="sub" data-i="cS"></p>
+<div class="grid2">
+<div class="box"><h3 data-i="inT"></h3>
+<div class="row"><div style="flex:1"><label class="fl" data-i="fSex"></label><select id="cSex"><option value="m" data-i="maleL"></option><option value="f" data-i="femaleL"></option></select></div><div style="flex:1"><label class="fl" data-i="fAge"></label><input type="number" id="cAge" value="30"></div></div>
+<div class="row"><div style="flex:1"><label class="fl" data-i="fW"></label><input type="number" id="cW" value="80" step="any"></div><div style="flex:1"><label class="fl" data-i="fH"></label><input type="number" id="cH" value="180" step="any"></div></div>
+<label class="fl" data-i="fAct"></label><select id="cAct"><option value="1.2" data-i="a0"></option><option value="1.375" data-i="a1"></option><option value="1.55" data-i="a2" selected></option><option value="1.725" data-i="a3"></option><option value="1.9" data-i="a4"></option></select>
+<label class="fl" data-i="fGoal"></label><select id="cGoal"><option value="lose" data-i="gLose"></option><option value="cut" data-i="gCut"></option><option value="maintain" data-i="gMain" selected></option><option value="bulk" data-i="gBulk"></option></select>
+<label class="fl" data-i="fRate"></label><select id="cRate"><option value="0.25" data-i="rSlow"></option><option value="0.5" data-i="rNorm" selected></option><option value="1" data-i="rFast"></option></select>
+<label class="fl" data-i="fMeals"></label><input type="number" id="cMeals" value="4" min="2" max="6">
+<div class="row"><button class="go" onclick="calc()" data-i="btnCalc"></button></div>
+</div>
+<div class="box"><h3 data-i="outT"></h3><div id="calcRes">—</div></div>
+</div>
+</section>
+<section class="panel" id="p-swap">
+<h2 data-i="sT"></h2><p class="sub" data-i="sS"></p>
+<div class="row"><select id="swFood" style="flex:1;min-width:180px"></select><input type="number" id="swGram" value="100" style="max-width:120px"><select id="swMode" style="max-width:170px"><option value="kcal" data-i="mKcal"></option><option value="protein" data-i="mPro"></option><option value="carb" data-i="mCarb"></option></select><button class="go" onclick="renderSwap()" data-i="btnSwap"></button></div>
+<div style="overflow-x:auto"><table class="bt"><thead><tr><th data-i="cFood"></th><th data-i="cGrams"></th><th data-i="cPro"></th><th data-i="cCarb"></th><th data-i="cFat"></th><th data-i="cKcal"></th></tr></thead><tbody id="swapBody"></tbody></table></div>
+</section>
+<section class="panel" id="p-menu">
+<h2 data-i="mT"></h2><p class="sub" data-i="mS"></p>
+<div class="row"><button class="go" onclick="buildMenu()" data-i="btnMenu"></button></div>
+<div id="menuOut"></div>
+</section>
+<section class="panel" id="p-supp">
+<h2 data-i="uT"></h2><p class="sub" data-i="uS"></p>
+<div class="suppgrid" id="suppGrid"></div>
+</section>
+<section class="panel" id="p-donate">
+<h2 data-i="doT"></h2><p class="sub" data-i="doS"></p>
+<div class="donate">
+<div>₿ BTC</div><div class="addr" id="btcA"></div>
+<div>₮ USDT-TRC20</div><div class="addr" id="usdtA"></div>
+<div class="row" style="justify-content:center"><button class="alt" onclick="copyTxt(document.getElementById('btcA').textContent)" data-i="btnCopy"></button></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — TRY: <code dir="ltr">TR10 0001 0090 1008 4013 0050 01</code></div>
+<div style="font-size:12.5px">🏦 Baran Avisat — USD: <code dir="ltr">TR80 0001 0090 1008 4013 0050 02</code></div>
+</div>
+</section>
+</main>
+<div class="adslot" id="adFoot"><span class="ph" data-i="adHere" style="display:block;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:12px;padding:10px"></span></div>
+<footer><span data-i="foot"></span><br>📧 <a href="mailto:baranavisat@gmail.com">baranavisat@gmail.com</a> · 📞 <a href="tel:+905313263722" dir="ltr">+90 531 326 37 22</a> · <a href="https://wa.me/905313263722" target="_blank" rel="noopener">WhatsApp</a><br><a href="README.md" target="_blank">README</a> · MIT</footer>
+<div id="toast"></div>
+<script>
+const CONFIG={ads:{client:'',slot:'',carbonServe:'',carbonPlacement:''},
+pay:{btc:'bc1q8dhtdrndxsl70e97t8grydfe6pjue37zrhzf6c',usdt:'TLWdTjqqogkXNEXGiPWsGdjFP6ioycxeWW'},
+supp:{iherb:'',amazon:''}};
+const FOODS=[
+{n:'Oats',p:13.2,c:66.3,f:6.5},{n:'Rice (cooked)',p:2.7,c:28,f:0.3},{n:'Chicken breast',p:31,c:0,f:3.6},{n:'Eggs',p:12.6,c:1.1,f:9.5},{n:'Greek yogurt',p:9.7,c:3.9,f:5},{n:'Milk 3%',p:3.3,c:4.8,f:3.3},{n:'Tuna (canned)',p:23.5,c:0,f:1},{n:'Salmon',p:20,c:0,f:13},{n:'Beef (lean)',p:26,c:0,f:10},{n:'Lentils (cooked)',p:9,c:20,f:0.4},{n:'Chickpeas (cooked)',p:8.9,c:27.4,f:2.6},{n:'Kidney beans',p:8.7,c:22.8,f:0.5},{n:'Whole wheat bread',p:13,c:41,f:4.2},{n:'Pasta (cooked)',p:5.8,c:31,f:0.9},{n:'Potato',p:2,c:17,f:0.1},{n:'Sweet potato',p:1.6,c:20,f:0.1},{n:'Banana',p:1.1,c:22.8,f:0.3},{n:'Apple',p:0.3,c:13.8,f:0.2},{n:'Almonds',p:21.2,c:21.6,f:49.9},{n:'Peanuts',p:25.8,c:16.1,f:49.2},{n:'Peanut butter',p:25,c:20,f:50},{n:'Olive oil',p:0,c:0,f:100},{n:'Whey protein',p:80,c:6,f:6},{n:'Broccoli',p:2.8,c:6.6,f:0.4},{n:'Cottage cheese',p:11,c:3.4,f:4.3}];
+const SUPPS=[
+{k:'whey',n:'Whey Protein',d:'~25g protein / serving',q:'whey protein'},
+{k:'creatine',n:'Creatine Monohydrate',d:'5g / day — strength',q:'creatine monohydrate'},
+{k:'multi',n:'Multivitamin',d:'daily micronutrients',q:'multivitamin'},
+{k:'omega',n:'Omega-3 Fish Oil',d:'EPA + DHA',q:'omega 3 fish oil'},
+{k:'vitd',n:'Vitamin D3',d:'2000–4000 IU',q:'vitamin d3'}];
+const T={
+en:{tag:'Macro, meal-prep & food-swap calculator',tabC:'🧮 Calculator',tabS:'🔁 Food Swaps',tabM:'🍽️ Sample Menu',tabU:'💊 Supplements',tabDo:'💚 Donate',
+medNote:'⚕️ Educational estimates, not medical advice. Consult a professional for health conditions.',
+cT:'🧮 Macro Calculator',cS:'Mifflin-St Jeor + activity + goal rate → calories, protein / carbs / fat, fiber and water.',
+inT:'Inputs',outT:'Targets',fSex:'Gender',maleL:'Male',femaleL:'Female',fAge:'Age',fW:'Weight (kg)',fH:'Height (cm)',fAct:'Activity',a0:'Sedentary',a1:'Light (1–3 d/wk)',a2:'Moderate (3–5 d/wk)',a3:'Very active',a4:'Athlete',fGoal:'Goal',gLose:'Lose weight',gCut:'Cut (lean)',gMain:'Maintain',gBulk:'Bulk (gain)',fRate:'Weekly rate',rSlow:'Slow 0.25 kg',rNorm:'Normal 0.5 kg',rFast:'Fast 1.0 kg',fMeals:'Meals / day',btnCalc:'Calculate',
+bmrL:'BMR',tdeeL:'TDEE',tgtL:'Target kcal',warnLow:'⚠️ Below safe minimum — raised to safety floor. Eat more / slow down.',
+sT:'🔁 Smart Food Swaps',sS:'Pick a food + amount — get equivalent grams of every alternative matched by calories, protein or carbs.',
+mKcal:'match: kcal',mPro:'match: protein',mCarb:'match: carbs',btnSwap:'Show swaps',cFood:'Food',cGrams:'Grams',cPro:'Protein',cCarb:'Carbs',cFat:'Fat',cKcal:'kcal',
+mT:'🍽️ Sample Day Menu',mS:'Auto-built from your targets (approximate — adjust portions to taste).',btnMenu:'Build my menu',mealL:'Meal',
+uT:'💊 Supplements (Affiliate)',uS:'REF-marked links earn us a commission at the same price for you.',
+doT:'💚 Support MacroFit',doS:'Free forever. Donations keep the database growing.',
+btnCopy:'Copy',adHere:'Healthy-food & supplement ads here',foot:'MacroFit — free calculator. Estimates only.',
+copied:'Copied ✅',needNum:'Enter valid body stats ⚠️',refOff:'Official store',waterL:'Water',fiberL:'Fiber',perMealL:'per meal'},
+tr:{tag:'Makro, öğün ve gıda-değişim hesaplayıcı',tabC:'🧮 Hesaplayıcı',tabS:'🔁 Değişimler',tabM:'🍽️ Örnek Menü',tabU:'💊 Takviyeler',tabDo:'💚 Destek',
+medNote:'⚕️ Eğitsel tahminlerdir, tıbbi tavsiye değildir. Sağlık durumunuz için uzmana danışın.',
+cT:'🧮 Makro Hesaplayıcı',cS:'Mifflin-St Jeor + aktivite + hedef → kalori, protein / karbonhidrat / yağ, lif ve su.',
+inT:'Girdiler',outT:'Hedefler',fSex:'Cinsiyet',maleL:'Erkek',femaleL:'Kadın',fAge:'Yaş',fW:'Kilo (kg)',fH:'Boy (cm)',fAct:'Aktivite',a0:'Hareketsiz',a1:'Hafif (1–3 gün)',a2:'Orta (3–5 gün)',a3:'Çok aktif',a4:'Sporcu',fGoal:'Hedef',gLose:'Kilo ver',gCut:'Definasyon',gMain:'Koru',gBulk:'Hacim al',fRate:'Haftalık hız',rSlow:'Yavaş 0.25 kg',rNorm:'Normal 0.5 kg',rFast:'Hızlı 1.0 kg',fMeals:'Öğün / gün',btnCalc:'Hesapla',
+bmrL:'BMR',tdeeL:'TDEE',tgtL:'Hedef kalori',warnLow:'⚠️ Güvenli minimumun altında — tabana çekildi.',
+sT:'🔁 Akıllı Gıda Değişimleri',sS:'Gıda + miktar seç — kalori, protein veya karbonhidrata göre eşdeğer gramları gör.',
+mKcal:'eşle: kalori',mPro:'eşle: protein',mCarb:'eşle: karb',btnSwap:'Değişimleri göster',cFood:'Gıda',cGrams:'Gram',cPro:'Protein',cCarb:'Karb',cFat:'Yağ',cKcal:'kkal',
+mT:'🍽️ Örnek Gün Menüsü',mS:'Hedeflerinden otomatik kurulur (yaklaşık).',btnMenu:'Menümü kur',mealL:'Öğün',
+uT:'💊 Takviyeler (Affiliate)',uS:'REF bağlantılar bize kazandırır, size aynı fiyat.',
+doT:'💚 Destekle',doS:'Sonsuza dek ücretsiz.',
+btnCopy:'Kopyala',adHere:'Sağlıklı gıda reklamları burada',foot:'MacroFit — ücretsiz hesaplayıcı. Tahminidir.',
+copied:'Kopyalandı ✅',needNum:'Geçerli değer girin ⚠️',refOff:'Resmi mağaza',waterL:'Su',fiberL:'Lif',perMealL:'öğün başına'},
+ar:{tag:'حاسبة الماكروز والوجبات والبدائل',tabC:'🧮 الحاسبة',tabS:'🔁 البدائل',tabM:'🍽️ قائمة',tabU:'💊 مكملات',tabDo:'💚 ادعم',
+medNote:'⚕️ تقديرات تعليمية وليست طبية. استشر مختصاً للحالات الصحية.',
+cT:'🧮 حاسبة الماكروز',cS:'Mifflin-St Jeor + النشاط + الهدف ← سعرات وبروتين وكارب ودهون وألياف وماء.',
+inT:'المدخلات',outT:'الأهداف',fSex:'الجنس',maleL:'ذكر',femaleL:'أنثى',fAge:'العمر',fW:'الوزن (كغ)',fH:'الطول (سم)',fAct:'النشاط',a0:'خامل',a1:'خفيف',a2:'متوسط',a3:'نشط جداً',a4:'رياضي',fGoal:'الهدف',gLose:'خسارة وزن',gCut:'تنشيف',gMain:'ثبات',gBulk:'تضخيم',fRate:'المعدل الأسبوعي',rSlow:'بطيء 0.25',rNorm:'عادي 0.5',rFast:'سريع 1.0',fMeals:'وجبات / يوم',btnCalc:'احسب',
+bmrL:'الأيض',tdeeL:'الاحتياج',tgtL:'السعرات المستهدفة',warnLow:'⚠️ تحت الحد الآمن — رُفع للحد الأدنى.',
+sT:'🔁 بدائل ذكية',sS:'اختر طعاماً وكمية — واحصل على مكافئاتها بالسعرات أو البروتين أو الكارب.',
+mKcal:'طابق: سعرات',mPro:'طابق: بروتين',mCarb:'طابق: كارب',btnSwap:'اعرض البدائل',cFood:'الطعام',cGrams:'غرام',cPro:'بروتين',cCarb:'كارب',cFat:'دهون',cKcal:'سعرة',
+mT:'🍽️ قائمة يومية',mS:'تُبنى تلقائياً من أهدافك (تقريبية).',btnMenu:'ابنِ قائمتي',mealL:'وجبة',
+uT:'💊 مكملات (تسويق)',uS:'روابط REF تكسبنا بنفس السعر لك.',
+doT:'💚 ادعم MacroFit',doS:'مجاني للأبد.',
+btnCopy:'نسخ',adHere:'إعلانات الأغذية الصحية هنا',foot:'MacroFit — حاسبة مجانية. تقديرات فقط.',
+copied:'تم ✅',needNum:'أدخل قيماً صالحة ⚠️',refOff:'المتجر الرسمي',waterL:'الماء',fiberL:'الألياف',perMealL:'للوجبة'}};
+let lang='en',curT=null;
+const t=k=>(T[lang]&&T[lang][k])||T.en[k]||k;
+function setLang(v){lang=v;document.documentElement.lang=v;document.documentElement.dir=(v==='ar')?'rtl':'ltr';document.getElementById('langSel').value=v;
+document.querySelectorAll('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i);});
+buildTabs();buildSwap();renderSupp();renderDonate();}
+const TABS=[['calc','tabC'],['swap','tabS'],['menu','tabM'],['supp','tabU'],['donate','tabDo']];
+function buildTabs(){document.getElementById('tabs').innerHTML=TABS.map(x=>`<button id="tab-${x[0]}" onclick="tab('${x[0]}')">${t(x[1])}</button>`).join('');document.getElementById('tab-calc').classList.add('on');}
+function tab(w){TABS.forEach(x=>{const b=document.getElementById('tab-'+x[0]);if(b)b.classList.toggle('on',w===x[0]);document.getElementById('p-'+x[0]).classList.toggle('on',w===x[0]);});}
+function toast(m){let d=document.getElementById('toast');d.textContent=m;d.style.display='block';clearTimeout(d._h);d._h=setTimeout(()=>d.style.display='none',2200);}
+function copyTxt(x){try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(x);}catch(e){}toast(t('copied'));}
+function num(id,d){const v=parseFloat((document.getElementById(id)||{}).value);return isNaN(v)?(d||0):v;}
+function calcTargets(o){
+const bmr=o.sex==='m'?10*o.w+6.25*o.h-5*o.age+5:10*o.w+6.25*o.h-5*o.age-161;
+const tdee=bmr*o.act;
+let tgt=tdee;
+if(o.goal==='lose'||o.goal==='cut')tgt=tdee-o.rate*1100*(o.goal==='cut'?0.6:1);
+if(o.goal==='bulk')tgt=tdee+300;
+const floor=Math.max(1200,o.sex==='f'?1350:1500,bmr*1.05);
+let warned=false;
+if(tgt<floor){tgt=floor;warned=true;}
+const pk=o.goal==='bulk'?1.8:o.goal==='maintain'?1.7:2.1;
+let pro=Math.round(pk*o.w);
+const fatK=Math.round(tgt*0.25),fat=Math.round(fatK/9*10)/10;
+let carbK=Math.max(0,tgt-pro*4-fatK);
+let carb=Math.round(carbK/4);
+const tot=pro*4+carb*4+fat*9;
+return {bmr:Math.round(bmr),tdee:Math.round(tdee),tgt:Math.round(tgt),pro,carb,fat,fiber:Math.round(tgt/1000*14),water:+(o.w*0.035).toFixed(1),warned,check:tot};
+}
+function calc(){
+const o={sex:document.getElementById('cSex').value,age:num('cAge',30),w:num('cW'),h:num('cH'),act:num('cAct',1.55),goal:document.getElementById('cGoal').value,rate:num('cRate',0.5),meals:Math.max(2,Math.min(6,Math.round(num('cMeals',4))))};
+if(!(o.w>20&&o.w<400&&o.h>100&&o.h<250&&o.age>10&&o.age<100)){toast(t('needNum'));return;}
+const r=calcTargets(o);curT={o,r};
+const pp=r.pro/r.tgt*100,cc=r.carb*4/r.tgt*100,ff=100-pp-cc;
+document.getElementById('calcRes').innerHTML=`${t('bmrL')}: <b>${r.bmr}</b> · ${t('tdeeL')}: <b>${r.tdee}</b><br>${t('tgtL')}: <b class="big">${r.tgt} kcal</b><div class="macrobar"><div style="width:${pp}%;background:#f87171" title="P"></div><div style="width:${cc}%;background:#fbbf24" title="C"></div><div style="width:${ff}%;background:#60a5fa" title="F"></div></div><table class="bt"><tr><td>🥩 Protein</td><td class="n"><b>${r.pro}g</b></td></tr><tr><td>🍚 Carbs</td><td class="n"><b>${r.carb}g</b></td></tr><tr><td>🧈 Fat</td><td class="n"><b>${r.fat}g</b></td></tr><tr><td>🌾 ${t('fiberL')}</td><td class="n">${r.fiber}g</td></tr><tr><td>💧 ${t('waterL')}</td><td class="n">${r.water}L</td></tr><tr><td>🍽️ /${t('perMealL')}</td><td class="n">${Math.round(r.pro/o.meals)}P · ${Math.round(r.carb/o.meals)}C · ${Math.round(r.fat/o.meals)}F</td></tr></table>${r.warned?`<div class="warn">${t('warnLow')}</div>`:''}`;
+return r;
+}
+function kcal100(f){return f.p*4+f.c*4+f.f*9;}
+function buildSwap(){
+document.getElementById('swFood').innerHTML=FOODS.map((f,i)=>`<option value="${i}">${f.n}</option>`).join('');
+}
+function swapGrams(src,g,mode){
+const m=mode==='protein'?'p':mode==='carb'?'c':null;
+const srcVal=m?src[m]:kcal100(src);
+return FOODS.map(f=>{const fv=m?f[m]:kcal100(f);return {f,g:fv>0?Math.round(g*srcVal/fv):0};}).filter(x=>x.g>0&&x.g<5000);
+}
+function renderSwap(){
+const src=FOODS[+document.getElementById('swFood').value||0]||FOODS[0];
+const g=Math.max(1,num('swGram',100)),mode=document.getElementById('swMode').value;
+const rows=swapGrams(src,g,mode);
+const met=mode==='protein'?'p':mode==='carb'?'c':null;
+document.getElementById('swapBody').innerHTML=rows.map(x=>{const f=x.f;
+const pv=met?f[met]*x.g/100:kcal100(f)*x.g/100;
+const cv=f.c*x.g/100,fv=f.f*x.g/100,kv=kcal100(f)*x.g/100;
+return `<tr${f.n===src.n?' style="background:#0e2a1d"':''}><td><b>${f.n}</b></td><td class="n">${x.g}g</td><td class="n">${(f.p*x.g/100).toFixed(1)}</td><td class="n">${cv.toFixed(1)}</td><td class="n">${fv.toFixed(1)}</td><td class="n">${Math.round(kv)}</td></tr>`;}).join('');
+}
+function pickProt(need){const c=FOODS.filter(f=>f.p>=15&&['Whey','Chicken','Eggs','Tuna','Beef','Salmon','Greek'].some(k=>f.n.includes(k)));c.sort((a,b)=>(b.p/ (kcal100(b)||1))-(a.p/(kcal100(a)||1)));return c[0]||FOODS[2];}
+function pickCarb(need){const c=FOODS.filter(f=>f.c>=15&&['Oats','Rice','Bread','Pasta','Potato','Banana'].some(k=>f.n.includes(k)));return c[0]||FOODS[0];}
+function buildMenu(){
+if(!curT)calc();if(!curT)return;
+const {o,r}=curT,mp={p:r.pro/o.meals,c:r.carb/o.meals,f:r.fat/o.meals};
+let h='';
+for(let m=1;m<=o.meals;m++){
+const pr=pickProt(),cb=pickCarb();
+const gp=Math.min(400,Math.round(mp.p/(pr.p||1)*100));
+const gc=Math.min(400,Math.round(mp.c/(cb.c||1)*100));
+const gf=Math.max(0,Math.round((mp.f-pr.f*gp/100-cb.f*gc/100)/10)*10);
+h+=`<div class="note"><b>${t('mealL')} ${m}</b> — ${pr.n} ${gp}g + ${cb.n} ${gc}g${gf>0?' + Olive oil '+gf+'g':''}<br><small>≈ ${Math.round(gp*pr.p/100)}P · ${Math.round(gc*cb.c/100)}C · ${Math.round((pr.f*gp+cb.f*gc)/100+gf)}F</small></div>`;
+}
+document.getElementById('menuOut').innerHTML=h;
+}
+function suppUrl(store,q){if(store==='iherb')return 'https://www.iherb.com/search?kw='+encodeURIComponent(q);return 'https://www.amazon.com/s?k='+encodeURIComponent(q);}
+function isAff(store){return !!(CONFIG.supp&&CONFIG.supp[store]);}
+function affUrl(store,q){return (CONFIG.supp&&CONFIG.supp[store])||suppUrl(store,q);}
+function renderSupp(){
+const SUPPS=[['whey','Whey Protein','~25g protein / serving','whey protein'],['creatine','Creatine Monohydrate','5g / day','creatine monohydrate'],['multi','Multivitamin','daily micros','multivitamin'],['omega','Omega-3 Fish Oil','EPA + DHA','omega 3 fish oil'],['vitd','Vitamin D3','2000–4000 IU','vitamin d3']];
+document.getElementById('suppGrid').innerHTML=SUPPS.map(s=>`<div class="supp"><b>${s[1]}${isAff('iherb')||isAff('amazon')?'<span class="refbadge">REF</span>':''}</b><small>${s[2]}</small><br><a target="_blank" rel="nofollow sponsored noopener" href="${affUrl('iherb',s[3])}">iHerb →</a> <a target="_blank" rel="nofollow sponsored noopener" href="${affUrl('amazon',s[3])}">Amazon →</a></div>`).join('');
+}
+function renderDonate(){
+document.getElementById('btcA').textContent=CONFIG.pay.btc;
+document.getElementById('usdtA').textContent=CONFIG.pay.usdt;
+}
+function loadAds(){const A=CONFIG.ads,el=document.getElementById('adFoot');if(!el)return;
+if(A.client){el.innerHTML='<ins class="adsbygoogle" style="display:block" data-ad-client="'+A.client+'" data-ad-slot="'+(A.slot||'')+'" data-ad-format="auto"></ins>';
+if(!document.querySelector('script[src*="adsbygoogle"]')){const s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+A.client;s.crossOrigin='anonymous';document.head.appendChild(s);}try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}}
+else if(A.carbonServe){el.innerHTML='';const s=document.createElement('script');s.async=true;s.id='_carbonads_js';s.src='//cdn.carbonads.com/carbon.js?serve='+A.carbonServe+'&placement='+A.carbonPlacement;el.appendChild(s);}}
+setLang('en');loadAds();renderDonate();
+</script>
+</body>
+</html>
